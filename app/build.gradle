@@ -14,20 +14,25 @@ android {
             testInstrumentationRunner "android.test.InstrumentationTestRunner"
         }
 
-    buildTypes {
-        debug {
-            minifyEnabled true
-            shrinkResources true
-        }
-        release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
-    }
+
 
     lintOptions{
         abortOnError true
+    }
+
+
+    signingConfigs{
+        release{
+
+        }
+
+        red{
+
+        }
+
+        blue{
+
+        }
     }
 
     sourceSets{
@@ -42,7 +47,7 @@ android {
         }
 
         free{
-            //修改free版本中的icon
+            //修改free版本中的icon/颜色
             res.srcDirs = ['src/free/res']
         }
     }
@@ -64,9 +69,42 @@ android {
         }
         free {
             flavorDimension "price"
+
         }
         paid {
             flavorDimension "price"
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+        }
+        release {
+            /*
+             * 不同的版本使用不同的签名
+             */
+            productFlavors.red.signingConfig signingConfigs.red
+            productFlavors.blue.signingConfig signingConfigs.blue
+            //signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    /*
+     *  忽略某个变体,变体过滤器
+     *  下面是忽略release和blue的组合变体
+     */
+    android.variantFilter { variant ->
+        if(variant.buildType.name.equals('release')) {
+            variant.getFlavors().each() { flavor ->
+                if (flavor.name.equals('blue')) {
+                    variant.setIgnore(true);
+                }
+            }
         }
     }
 }
