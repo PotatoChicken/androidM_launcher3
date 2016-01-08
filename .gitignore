@@ -1,0 +1,36 @@
+# OS
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+db_files
+
+
+
+
+# eclipse
+.classpath
+.project
+.settings
+/gen/
+/bin/
+
+#android
+*.apk
+*.ap_
+*.dex
+
+*.iml
+build
+.gradle/*
+.idea/*
+.settings/*
+
+/gradle/
+/gradlew
+/gradlew.bat
+/build/
+/captures/
+/bug/
+/proguard/
+*.properties

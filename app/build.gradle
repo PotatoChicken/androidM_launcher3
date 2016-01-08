@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.protobuf'
+android {
+
+        compileSdkVersion rootProject.ext.compileSdkVersion
+        buildToolsVersion rootProject.ext.buildToolsVersion
+
+        defaultConfig {
+            applicationId "com.android.launcher3"
+            minSdkVersion 16
+            targetSdkVersion 23
+
+            testApplicationId "com.android.launcher3.tests"
+            testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    lintOptions{
+        abortOnError true
+    }
+
+    sourceSets{
+        main{
+            proto.srcDirs 'protos/'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-2'
+}
+
+
+protobuf {
+    // Configure the protoc executable
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0-alpha-2'
+    }
+}
