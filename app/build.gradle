@@ -32,7 +32,41 @@ android {
 
     sourceSets{
         main{
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            aidl.srcDirs = ['src/main/java']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
+
             proto.srcDirs 'protos/'
+        }
+
+        free{
+            //修改free版本中的icon
+            res.srcDirs = ['src/free/res']
+        }
+    }
+
+    /*
+     * flavorDimensions 把productFlavors分成不同的维度，不同的维度之间进行组合
+     * 下面将productFlavors分为两组，分别为color[red, blue]h和price[free, paid]
+     * flavorDimensions数组有先后，不同的顺序组合成的BuildVariant不同
+     *
+     * price -> color -> defaultConfig
+     */
+    flavorDimensions "price", "color"
+    productFlavors {
+        red {
+            flavorDimension "color"
+        }
+        blue {
+            flavorDimension "color"
+        }
+        free {
+            flavorDimension "price"
+        }
+        paid {
+            flavorDimension "price"
         }
     }
 }
