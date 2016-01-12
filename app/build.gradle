@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.protobuf'
+
 android {
 
         compileSdkVersion rootProject.ext.compileSdkVersion
@@ -7,17 +8,36 @@ android {
 
         defaultConfig {
             applicationId "com.android.launcher3"
-            minSdkVersion 16
+            minSdkVersion 17
             targetSdkVersion 23
 
             testApplicationId "com.android.launcher3.tests"
             testInstrumentationRunner "android.test.InstrumentationTestRunner"
+            testHandleProfiling true
+            testFunctionalTest true
         }
 
 
 
     lintOptions{
         abortOnError true
+
+        check 'NewApi', 'InlinedApi'
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/MANIFEST.MF'
     }
 
 
@@ -34,7 +54,6 @@ android {
 
         }
     }
-
     sourceSets{
         main{
             manifest.srcFile 'src/main/AndroidManifest.xml'
@@ -60,6 +79,13 @@ android {
      * price -> color -> defaultConfig
      */
     flavorDimensions "price", "color"
+
+    /*
+     * 注意 ProductFlavor 类型的 android.productFlavors.* 对象
+     * 与 android.defaultConfig 对象的类型是相同的,
+     * 就是说着它们拥有一样的属性。
+     * defaultConfig 为所有的 flavor 提供基本的配置，每一个 flavor 都可以重写这些配置的值。
+     */
     productFlavors {
         red {
             flavorDimension "color"
@@ -79,6 +105,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled true
+            zipAlignEnabled true
             shrinkResources true
         }
         release {
@@ -90,6 +117,7 @@ android {
             //signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
+            zipAlignEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -107,12 +135,35 @@ android {
             }
         }
     }
+
+    /**
+     * 修改apk名称
+     */
+    android.applicationVariants.each { variant ->
+        variant.outputs.each { output ->
+            File file = output.outputFile;
+            output.outputFile = new File(file.parent, project.name + ".apk")
+            output.zipAlign.doLast {
+                delete fileTree(dir: output.outputFile.parent, include: '*unaligned*.apk')
+                def now = new Date().format('yyyy');
+                copy {
+                    from output.outputFile
+                    into output.outputFile.parent
+                    rename(project.name + ".apk", project.name + "_V${defaultConfig.versionName}" + "_" + now + "_${variant.productFlavors[0].name}" + ".apk")
+                }
+
+            }
+        }
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-2'
+
+    //加入测试库
+    testCompile 'junit:junit:4.12'
 }
 
 
